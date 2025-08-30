@@ -36,20 +36,6 @@ if (isset($_SESSION['user']['name']) && !empty($_SESSION['user']['name']) && $_S
             </h4>
         </div>
         <div class="d-flex align-items-center">
-            <!-- Notifications Dropdown -->
-            <div class="dropdown me-3">
-                <button class="btn btn-outline-primary position-relative" type="button" id="notificationDropdown" data-bs-toggle="dropdown">
-                    <i class="fas fa-bell"></i>
-                    <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" id="notificationBadge">
-                        0
-                    </span>
-                </button>
-                <ul class="dropdown-menu dropdown-menu-end notification-dropdown" id="notificationList">
-                    <li class="dropdown-header">Notifications</li>
-                    <li><hr class="dropdown-divider"></li>
-                    <li class="text-center p-3 text-muted">Loading notifications...</li>
-                </ul>
-            </div>
             
             <!-- User Info -->
             <div class="d-flex align-items-center">
@@ -59,9 +45,6 @@ if (isset($_SESSION['user']['name']) && !empty($_SESSION['user']['name']) && $_S
                         <i class="fas fa-user"></i>
                     </button>
                     <ul class="dropdown-menu dropdown-menu-end">
-                        <li><a class="dropdown-item" href="#"><i class="fas fa-user-cog me-2"></i>Profile</a></li>
-                        <li><a class="dropdown-item" href="#"><i class="fas fa-cog me-2"></i>Settings</a></li>
-                        <li><hr class="dropdown-divider"></li>
                         <li><a class="dropdown-item" href="logout.php"><i class="fas fa-sign-out-alt me-2"></i>Logout</a></li>
                     </ul>
                 </div>
@@ -480,8 +463,37 @@ function setupEventListeners() {
     // Search functionality
     $('#globalSearch').on('input', function() {
         const searchTerm = $(this).val().toLowerCase();
-        // Implement search logic here
-        console.log('Searching for:', searchTerm);
+        
+        if (searchTerm.length === 0) {
+            // Show all content when search is empty
+            $('.stat-card').parent().show();
+            $('.modern-chart-card').parent().show();
+            return;
+        }
+        
+        // Hide/show stat cards based on search
+        $('.stat-card').each(function() {
+            const cardText = $(this).find('.stat-label').text().toLowerCase();
+            const cardParent = $(this).parent();
+            
+            if (cardText.includes(searchTerm)) {
+                cardParent.show();
+            } else {
+                cardParent.hide();
+            }
+        });
+        
+        // Hide/show chart cards based on search
+        $('.modern-chart-card').each(function() {
+            const cardTitle = $(this).find('.card-title').text().toLowerCase();
+            const cardParent = $(this).parent();
+            
+            if (cardTitle.includes(searchTerm)) {
+                cardParent.show();
+            } else {
+                cardParent.hide();
+            }
+        });
     });
     
     // Filter buttons functionality
@@ -529,7 +541,6 @@ function updateDashboardData() {
             dashboardData = data;
             updateStatCards(data);
             updateCharts(data);
-            updateNotifications(data.notifications || []);
             updateLastUpdatedTime();
         },
         error: function(xhr, status, error) {
@@ -584,7 +595,6 @@ function updateDashboardData() {
             
             updateStatCards(sampleData);
             updateCharts(sampleData);
-            updateNotifications(sampleData.notifications);
             updateLastUpdatedTime();
             
             // Silently use sample data without showing error
@@ -1088,39 +1098,6 @@ function updateSalesVsPurchasesChart(data) {
     }
 }
 
-function updateNotifications(notifications) {
-    const notificationList = $('#notificationList');
-    const notificationBadge = $('#notificationBadge');
-    
-    // Update badge count
-    notificationBadge.text(notifications.length);
-    notificationBadge.toggleClass('d-none', notifications.length === 0);
-    
-    // Clear existing notifications
-    notificationList.find('.notification-item').remove();
-    
-    if (notifications.length === 0) {
-        notificationList.append(`
-            <li class="text-center p-3 text-muted">
-                <i class="fas fa-check-circle me-2"></i>No new notifications
-            </li>
-        `);
-    } else {
-        notifications.forEach(notification => {
-            notificationList.append(`
-                <li class="notification-item d-flex align-items-center">
-                    <div class="notification-icon ${notification.type}">
-                        <i class="${notification.icon}"></i>
-                    </div>
-                    <div class="flex-grow-1">
-                        <div class="fw-semibold">${notification.message}</div>
-                        <small class="text-muted">Just now</small>
-                    </div>
-                </li>
-            `);
-        });
-    }
-}
 
 function updateLastUpdatedTime() {
     const now = new Date();

@@ -20,7 +20,16 @@
             </div>
         </div>
         <a href="invoice.php"><i class="fas fa-file-invoice-dollar me-2"></i> Invoice</a>
-        <a href="clients.php"><i class="fas fa-users me-2"></i> Clients</a>
+        <div class="sidebar-dropdown">
+            <a href="javascript:void(0)" onclick="toggleDropdown(this)">
+                <span><i class="fas fa-users me-2"></i> Clients</span>
+                <i class="fas fa-chevron-down dropdown-icon"></i>
+            </a>
+            <div class="sidebar-submenu">
+                <a href="add_client.php"><i class="fas fa-plus me-2"></i> Add Client</a>
+                <a href="client_list.php"><i class="fas fa-list me-2"></i> Client List</a>
+            </div>
+        </div>
 
     <?php elseif ($role == 'admin'): ?>
         <a href="add_purchase.php"><i class="fas fa-truck me-2"></i> Purchase</a>
@@ -47,7 +56,16 @@
                 <a href="product_list.php"><i class="fas fa-list me-2"></i> Product List</a>
             </div>
         </div>
-        <a href="clients.php"><i class="fas fa-users me-2"></i> Clients</a>
+        <div class="sidebar-dropdown">
+            <a href="javascript:void(0)" onclick="toggleDropdown(this)">
+                <span><i class="fas fa-users me-2"></i> Clients</span>
+                <i class="fas fa-chevron-down dropdown-icon"></i>
+            </a>
+            <div class="sidebar-submenu">
+                <a href="add_client.php"><i class="fas fa-plus me-2"></i> Add Client</a>
+                <a href="client_list.php"><i class="fas fa-list me-2"></i> Client List</a>
+            </div>
+        </div>
         <a href="reports.php"><i class="fas fa-chart-bar me-2"></i> Reports</a>
         <a href="admin_users.php"><i class="fas fa-user-cog me-2"></i> User Control</a>
     <?php endif; ?>

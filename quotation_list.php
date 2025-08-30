@@ -707,7 +707,8 @@ function printCreateInvoice() {
     })
     .catch(error => {
         console.error('Error:', error);
-        alert('An error occurred while creating invoice');
+        console.error('Full error details:', error.stack);
+        alert('An error occurred while creating invoice. Check console for details.');
     })
     .finally(() => {
         // Restore button state

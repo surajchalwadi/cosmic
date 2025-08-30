@@ -22,6 +22,17 @@ if ($products_result) {
     $products_error = "Products table not found. Please run product_setup.php first.";
 }
 
+// Fetch active clients for dropdown
+$clients = [];
+$clients_query = "SELECT client_id, client_name, company FROM clients WHERE status = 'Active' ORDER BY client_name";
+$clients_result = mysqli_query($conn, $clients_query);
+
+if ($clients_result) {
+    while ($client = mysqli_fetch_assoc($clients_result)) {
+        $clients[] = $client;
+    }
+}
+
 // Generate unique reference number
 $reference = 'QT' . str_pad(rand(1, 999), 3, '0', STR_PAD_LEFT);
 ?>
@@ -183,7 +194,14 @@ input[type="number"]::-webkit-inner-spin-button {
                                 <div class="input-group">
                                     <select name="client_id" class="form-control" id="client-select">
                                         <option value="">Select Client</option>
-                                        <!-- Client options will be populated here -->
+                                        <?php foreach ($clients as $client): ?>
+                                            <option value="<?= $client['client_id'] ?>" data-company="<?= htmlspecialchars($client['company']) ?>">
+                                                <?= htmlspecialchars($client['client_name']) ?>
+                                                <?php if ($client['company']): ?>
+                                                    - <?= htmlspecialchars($client['company']) ?>
+                                                <?php endif; ?>
+                                            </option>
+                                        <?php endforeach; ?>
                                     </select>
                                     <button type="button" class="btn btn-outline-primary" title="Add New Client">
                                         <i class="fas fa-plus"></i>
