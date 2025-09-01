@@ -54,20 +54,76 @@ if (isset($_SESSION['user']['name']) && !empty($_SESSION['user']['name']) && $_S
 
     <!-- Dashboard Content -->
     <div class="container-fluid mt-4">
-        <!-- Search and Filter Section -->
+        <!-- Universal Search Section -->
         <div class="search-filter-container">
             <div class="row align-items-center">
-                <div class="col-md-6">
+                <div class="col-md-8">
                     <div class="input-group">
                         <span class="input-group-text"><i class="fas fa-search"></i></span>
-                        <input type="text" class="form-control search-input" placeholder="Search invoices, quotations, products..." id="globalSearch">
+                        <input type="text" class="form-control search-input" placeholder="Search across all data - quotations, purchases, clients, products..." id="universalSearch">
                     </div>
                 </div>
-                <div class="col-md-6">
+                <div class="col-md-4">
                     <div class="d-flex gap-2 flex-wrap">
-                        <button class="btn btn-outline-primary filter-btn active" data-filter="all">All</button>
-                        <button class="btn btn-outline-primary filter-btn" data-filter="invoices">Invoices</button>
-                        <button class="btn btn-outline-primary filter-btn" data-filter="quotations">Quotations</button>
+                        <button class="btn btn-outline-primary filter-btn active" data-filter="all">All Results</button>
+                        <button class="btn btn-outline-secondary btn-sm" onclick="clearSearch()">Clear</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Search Results Section -->
+        <div class="search-results-section" id="searchResultsSection" style="display: none;">
+            <div class="row">
+                <!-- Quotations Results -->
+                <div class="col-lg-6 mb-4">
+                    <div class="search-results-card">
+                        <div class="card-header">
+                            <h6><i class="fas fa-file-invoice me-2"></i>Quotations</h6>
+                            <span class="badge bg-primary" id="quotationCount">0</span>
+                        </div>
+                        <div class="card-body" id="quotationResults">
+                            <p class="text-muted">No quotations found</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Clients Results -->
+                <div class="col-lg-6 mb-4">
+                    <div class="search-results-card">
+                        <div class="card-header">
+                            <h6><i class="fas fa-users me-2"></i>Clients</h6>
+                            <span class="badge bg-success" id="clientCount">0</span>
+                        </div>
+                        <div class="card-body" id="clientResults">
+                            <p class="text-muted">No clients found</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Products Results -->
+                <div class="col-lg-6 mb-4">
+                    <div class="search-results-card">
+                        <div class="card-header">
+                            <h6><i class="fas fa-box me-2"></i>Products</h6>
+                            <span class="badge bg-warning" id="productCount">0</span>
+                        </div>
+                        <div class="card-body" id="productResults">
+                            <p class="text-muted">No products found</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Purchases Results -->
+                <div class="col-lg-6 mb-4">
+                    <div class="search-results-card">
+                        <div class="card-header">
+                            <h6><i class="fas fa-shopping-cart me-2"></i>Purchases</h6>
+                            <span class="badge bg-danger" id="purchaseCount">0</span>
+                        </div>
+                        <div class="card-body" id="purchaseResults">
+                            <p class="text-muted">No purchases found</p>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -369,6 +425,65 @@ if (isset($_SESSION['user']['name']) && !empty($_SESSION['user']['name']) && $_S
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
 }
 
+.search-results-section {
+    margin-bottom: 2rem;
+}
+
+.search-results-card {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+    border: 1px solid #dee2e6;
+}
+
+.search-results-card .card-header {
+    background: #f8f9fa;
+    border-bottom: 1px solid #dee2e6;
+    padding: 1rem 1.25rem;
+    display: flex;
+    justify-content: between;
+    align-items: center;
+    border-radius: 12px 12px 0 0;
+}
+
+.search-results-card .card-body {
+    padding: 1rem 1.25rem;
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.search-result-item {
+    padding: 0.75rem;
+    border-bottom: 1px solid #f8f9fa;
+    transition: background-color 0.2s ease;
+    cursor: pointer;
+}
+
+.search-result-item:hover {
+    background-color: #f8f9fa;
+}
+
+.search-result-item:last-child {
+    border-bottom: none;
+}
+
+.search-result-title {
+    font-weight: 600;
+    color: #212529;
+    margin-bottom: 0.25rem;
+}
+
+.search-result-subtitle {
+    font-size: 0.875rem;
+    color: #6c757d;
+    margin-bottom: 0.25rem;
+}
+
+.search-result-meta {
+    font-size: 0.75rem;
+    color: #adb5bd;
+}
+
 .search-input {
     border-radius: 8px;
     border: 1px solid #dee2e6;
@@ -460,41 +575,139 @@ function setupEventListeners() {
         $('.sidebar').toggleClass('show');
     });
     
-    // Search functionality
-    $('#globalSearch').on('input', function() {
-        const searchTerm = $(this).val().toLowerCase();
+    // Universal Search functionality
+    let searchTimeout;
+    $('#universalSearch').on('input', function() {
+        const searchTerm = $(this).val().trim();
+        
+        clearTimeout(searchTimeout);
         
         if (searchTerm.length === 0) {
-            // Show all content when search is empty
-            $('.stat-card').parent().show();
-            $('.modern-chart-card').parent().show();
+            hideSearchResults();
+            showDashboardContent();
             return;
         }
         
-        // Hide/show stat cards based on search
-        $('.stat-card').each(function() {
-            const cardText = $(this).find('.stat-label').text().toLowerCase();
-            const cardParent = $(this).parent();
-            
-            if (cardText.includes(searchTerm)) {
-                cardParent.show();
-            } else {
-                cardParent.hide();
+        if (searchTerm.length < 2) {
+            return;
+        }
+        
+        searchTimeout = setTimeout(() => {
+            performUniversalSearch(searchTerm);
+        }, 300);
+    });
+
+    function performUniversalSearch(searchTerm) {
+        showSearchResults();
+        hideDashboardContent();
+        
+        // Show loading state
+        showSearchLoading();
+        
+        $.ajax({
+            url: 'api/global_search.php',
+            method: 'GET',
+            data: { q: searchTerm },
+            dataType: 'json',
+            success: function(response) {
+                hideSearchLoading();
+                displayUniversalSearchResults(response.results || []);
+            },
+            error: function() {
+                hideSearchLoading();
+                displayUniversalSearchResults([]);
+            }
+        });
+    }
+
+    function displayUniversalSearchResults(results) {
+        // Group results by type
+        const groupedResults = {
+            estimate: [],
+            client: [],
+            product: [],
+            purchase: []
+        };
+        
+        results.forEach(result => {
+            if (groupedResults[result.type]) {
+                groupedResults[result.type].push(result);
             }
         });
         
-        // Hide/show chart cards based on search
-        $('.modern-chart-card').each(function() {
-            const cardTitle = $(this).find('.card-title').text().toLowerCase();
-            const cardParent = $(this).parent();
-            
-            if (cardTitle.includes(searchTerm)) {
-                cardParent.show();
-            } else {
-                cardParent.hide();
-            }
+        // Display quotations
+        displayResultsInSection('quotationResults', 'quotationCount', groupedResults.estimate, 'quotation');
+        
+        // Display clients
+        displayResultsInSection('clientResults', 'clientCount', groupedResults.client, 'client');
+        
+        // Display products
+        displayResultsInSection('productResults', 'productCount', groupedResults.product, 'product');
+        
+        // Display purchases
+        displayResultsInSection('purchaseResults', 'purchaseCount', groupedResults.purchase, 'purchase');
+    }
+
+    function displayResultsInSection(containerId, countId, results, type) {
+        const container = $('#' + containerId);
+        const countBadge = $('#' + countId);
+        
+        countBadge.text(results.length);
+        
+        if (results.length === 0) {
+            container.html(`<p class="text-muted">No ${type}s found</p>`);
+            return;
+        }
+        
+        let html = '';
+        results.forEach(result => {
+            html += `
+                <div class="search-result-item" onclick="window.location.href='${result.url}'">
+                    <div class="search-result-title">${result.title}</div>
+                    <div class="search-result-subtitle">${result.subtitle}</div>
+                    <div class="search-result-meta">Click to view details</div>
+                </div>
+            `;
         });
-    });
+        
+        container.html(html);
+    }
+
+    function showSearchResults() {
+        $('#searchResultsSection').show();
+    }
+
+    function hideSearchResults() {
+        $('#searchResultsSection').hide();
+    }
+
+    function showDashboardContent() {
+        $('.stat-card').parent().show();
+        $('.modern-chart-card').parent().show();
+    }
+
+    function hideDashboardContent() {
+        $('.stat-card').parent().hide();
+        $('.modern-chart-card').parent().hide();
+    }
+
+    function showSearchLoading() {
+        $('#quotationResults').html('<div class="text-center"><i class="fas fa-spinner fa-spin"></i> Searching...</div>');
+        $('#clientResults').html('<div class="text-center"><i class="fas fa-spinner fa-spin"></i> Searching...</div>');
+        $('#productResults').html('<div class="text-center"><i class="fas fa-spinner fa-spin"></i> Searching...</div>');
+        $('#purchaseResults').html('<div class="text-center"><i class="fas fa-spinner fa-spin"></i> Searching...</div>');
+    }
+
+    function hideSearchLoading() {
+        // Loading will be replaced by actual results
+    }
+
+    // Clear search function
+    window.clearSearch = function() {
+        $('#universalSearch').val('');
+        hideSearchResults();
+        showDashboardContent();
+    };
     
     // Filter buttons functionality
     $('.filter-btn').click(function() {

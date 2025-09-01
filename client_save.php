@@ -18,7 +18,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $city = mysqli_real_escape_string($conn, $_POST['city']);
     $postal = mysqli_real_escape_string($conn, $_POST['postal']);
     $status = mysqli_real_escape_string($conn, $_POST['status']);
-    $created_by = $_SESSION['user']['user_id'];
+    // Handle created_by field safely
+    $created_by = isset($_SESSION['user']['id']) ? $_SESSION['user']['id'] : null;
 
     // Validate required fields
     if (empty($client_name)) {
@@ -38,17 +39,18 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         }
     }
 
-    // Insert client
-    $query = "INSERT INTO clients (client_name, company, email, phone, address, country, state, city, postal, status, created_by) 
-              VALUES ('$client_name', '$company', '$email', '$phone', '$address', '$country', '$state', '$city', '$postal', '$status', '$created_by')";
+    // Insert client using prepared statement
+    $stmt = mysqli_prepare($conn, "INSERT INTO clients (client_name, company, email, phone, address, country, state, city, postal, status, created_by) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+    mysqli_stmt_bind_param($stmt, 'ssssssssssi', $client_name, $company, $email, $phone, $address, $country, $state, $city, $postal, $status, $created_by);
 
-    if (mysqli_query($conn, $query)) {
+    if (mysqli_stmt_execute($stmt)) {
         $_SESSION['success'] = "Client added successfully!";
         header("Location: client_list.php");
     } else {
         $_SESSION['error'] = "Error adding client: " . mysqli_error($conn);
         header("Location: add_client.php");
     }
+    mysqli_stmt_close($stmt);
 } else {
     header("Location: add_client.php");
 }

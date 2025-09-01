@@ -141,8 +141,14 @@ DROP TABLE IF EXISTS quotations;
 SET FOREIGN_KEY_CHECKS = 1;
 
 -- Insert default admin user (password: admin123)
+-- Note: Use a proper password hash generator for production
 INSERT INTO users (name, email, password, role) VALUES 
 ('Admin', 'admin@cosmic.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'admin');
+
+-- Insert sample clients
+INSERT INTO clients (client_name, company, email, phone, address, country, city, state, postal, status) VALUES 
+('John Smith', 'Tech Solutions Inc', 'john@techsolutions.com', '+91-9876543210', '123 Business Park, Sector 1', 'India', 'Mumbai', 'Maharashtra', '400001', 'Active'),
+('Sarah Johnson', 'Digital Marketing Co', 'sarah@digitalmarketing.com', '+91-9876543211', '456 Corporate Plaza, Block A', 'India', 'Delhi', 'Delhi', '110001', 'Active');
 
 -- Insert sample products
 INSERT INTO products (product_name, description, price, status) VALUES 
@@ -150,4 +156,20 @@ INSERT INTO products (product_name, description, price, status) VALUES
 ('Desktop Monitor', '24-inch LED monitor with full HD resolution', 12000.00, 'Active'),
 ('Wireless Mouse', 'Ergonomic wireless mouse with USB receiver', 800.00, 'Active'),
 ('Keyboard', 'Mechanical keyboard with backlight', 2500.00, 'Active'),
-('Printer', 'All-in-one inkjet printer with scanner', 8500.00, 'Active'); 
+('Printer', 'All-in-one inkjet printer with scanner', 8500.00, 'Active'),
+('Software License', 'Annual software license for productivity suite', 15000.00, 'Active'),
+('Network Router', 'Enterprise-grade wireless router', 5500.00, 'Active'),
+('External Hard Drive', '2TB external storage device', 3500.00, 'Active');
+
+-- Insert sample estimates/quotations
+INSERT INTO estimates (estimate_number, estimate_date, status, client_id, bill_company, bill_client_name, bill_address, bill_country, bill_city, bill_state, bill_postal, subtotal, tax_amount, total_amount, created_by) VALUES 
+('EST-2024-001', '2024-08-30', 'Draft', 1, 'Tech Solutions Inc', 'John Smith', '123 Business Park, Sector 1', 'India', 'Mumbai', 'Maharashtra', '400001', 57800.00, 10404.00, 68204.00, 1),
+('EST-2024-002', '2024-08-30', 'Sent', 2, 'Digital Marketing Co', 'Sarah Johnson', '456 Corporate Plaza, Block A', 'India', 'Delhi', 'Delhi', '110001', 20300.00, 3654.00, 23954.00, 1);
+
+-- Insert sample estimate items
+INSERT INTO estimate_items (estimate_id, product_description, quantity, unit_price, amount) VALUES 
+(1, 'Laptop Computer - High-performance laptop for business use', 1.00, 45000.00, 45000.00),
+(1, 'Desktop Monitor - 24-inch LED monitor with full HD resolution', 1.00, 12000.00, 12000.00),
+(1, 'Wireless Mouse - Ergonomic wireless mouse with USB receiver', 1.00, 800.00, 800.00),
+(2, 'Software License - Annual software license for productivity suite', 1.00, 15000.00, 15000.00),
+(2, 'Network Router - Enterprise-grade wireless router', 1.00, 5500.00, 5500.00); 

@@ -4,8 +4,8 @@
 // OPTION 1: Gmail (Free) - Most Popular
 define('SMTP_HOST', 'smtp.gmail.com');
 define('SMTP_PORT', 587);
-define('SMTP_USERNAME', 'surajlchalwadi@gmail.com'); // Replace with your Gmail address
-define('SMTP_PASSWORD', 'ihju jxtq ijnm xawu'); // Replace with Gmail App Password (16 characters)
+define('SMTP_USERNAME', 'ssuraj12qw324@gmail.com');
+define('SMTP_PASSWORD', 'jsdjgmkdrdvuixyk'); // App password without spaces
 define('SMTP_SECURE', 'tls');
 
 // OPTION 2: Outlook/Hotmail (Free)
@@ -26,7 +26,7 @@ define('SMTP_PASSWORD', 'your-yahoo-app-password');
 define('SMTP_SECURE', 'tls');
 */
 
-define('FROM_EMAIL', 'surajlchalwadi@gmail.com'); // Replace with your Gmail address (same as SMTP_USERNAME)
+define('FROM_EMAIL', 'ssuraj12qw324@gmail.com'); // Replace with your Gmail address (same as SMTP_USERNAME)
 define('FROM_NAME', 'Cosmic Solutions');
 
 // Email templates
