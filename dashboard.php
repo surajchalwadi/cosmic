@@ -36,6 +36,30 @@ if (isset($_SESSION['user']['name']) && !empty($_SESSION['user']['name']) && $_S
             </h4>
         </div>
         <div class="d-flex align-items-center">
+            <!-- Admin Notification Bell -->
+            <?php if ($role === 'admin'): ?>
+            <div class="notification-dropdown me-4">
+                <button class="btn btn-primary position-relative shadow-sm" id="notificationBtn" data-bs-toggle="dropdown" aria-expanded="false" style="padding: 10px 15px; border-radius: 10px;">
+                    <i class="fas fa-bell" style="font-size: 1.1rem;"></i>
+                    <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" id="notificationBadge" style="display: none; font-size: 0.65rem; min-width: 20px; height: 20px; line-height: 16px;">
+                        0
+                    </span>
+                </button>
+                <ul class="dropdown-menu dropdown-menu-end" style="width: 350px; max-height: 400px; overflow-y: auto;">
+                    <li class="dropdown-header d-flex justify-content-between align-items-center">
+                        <span>Notifications</span>
+                        <button class="btn btn-sm btn-outline-secondary" onclick="markAllAsRead()">Mark All Read</button>
+                    </li>
+                    <li><hr class="dropdown-divider"></li>
+                    <div id="notificationsList">
+                        <div class="text-center p-4">
+                            <i class="fas fa-spinner fa-spin text-muted"></i>
+                            <p class="text-muted mt-2 mb-0">Loading...</p>
+                        </div>
+                    </div>
+                </ul>
+            </div>
+            <?php endif; ?>
             
             <!-- User Info -->
             <div class="d-flex align-items-center">
@@ -133,36 +157,24 @@ if (isset($_SESSION['user']['name']) && !empty($_SESSION['user']['name']) && $_S
         <div class="row g-4 mb-4">
             <div class="col-lg-3 col-md-6">
                 <div class="stat-card danger">
-                    <div class="stat-icon">
-                        <i class="fas fa-money-bill-wave"></i>
-                    </div>
                     <div class="stat-value" id="totalPurchaseDue">₹0</div>
                     <div class="stat-label">Total Purchase Due</div>
                 </div>
             </div>
             <div class="col-lg-3 col-md-6">
                 <div class="stat-card success">
-                    <div class="stat-icon">
-                        <i class="fas fa-chart-line"></i>
-                    </div>
                     <div class="stat-value" id="totalSalesDue">₹0</div>
                     <div class="stat-label">Total Sales Due</div>
                 </div>
             </div>
             <div class="col-lg-3 col-md-6">
                 <div class="stat-card warning">
-                    <div class="stat-icon">
-                        <i class="fas fa-rupee-sign"></i>
-                    </div>
                     <div class="stat-value" id="totalSalesAmount">₹0</div>
                     <div class="stat-label">Total Sales Amount</div>
                 </div>
             </div>
             <div class="col-lg-3 col-md-6">
                 <div class="stat-card danger">
-                    <div class="stat-icon">
-                        <i class="fas fa-shopping-cart"></i>
-                    </div>
                     <div class="stat-value" id="totalPurchaseAmount">₹0</div>
                     <div class="stat-label">Total Purchase Amount</div>
                 </div>
@@ -173,27 +185,18 @@ if (isset($_SESSION['user']['name']) && !empty($_SESSION['user']['name']) && $_S
         <div class="row g-4 mb-4">
             <div class="col-lg-4 col-md-6">
                 <div class="stat-card info">
-                    <div class="stat-icon">
-                        <i class="fas fa-users"></i>
-                    </div>
-                    <div class="stat-value" id="totalUsers">0</div>
-                    <div class="stat-label">Total Users</div>
+                    <div class="stat-value" id="totalClients">0</div>
+                    <div class="stat-label">Total Clients</div>
                 </div>
             </div>
             <div class="col-lg-4 col-md-6">
                 <div class="stat-card purple">
-                    <div class="stat-icon">
-                        <i class="fas fa-file-invoice"></i>
-                    </div>
                     <div class="stat-value" id="purchaseInvoices">0</div>
                     <div class="stat-label">Purchase Invoices</div>
                 </div>
             </div>
             <div class="col-lg-4 col-md-6">
                 <div class="stat-card orange">
-                    <div class="stat-icon">
-                        <i class="fas fa-boxes"></i>
-                    </div>
                     <div class="stat-value" id="stockItems">0</div>
                     <div class="stat-label">Stock Items</div>
                 </div>
@@ -361,22 +364,8 @@ if (isset($_SESSION['user']['name']) && !empty($_SESSION['user']['name']) && $_S
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.12);
 }
 
-.stat-card::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 4px;
-}
 
-.stat-card.primary::before { background: #0d6efd; }
-.stat-card.success::before { background: #198754; }
-.stat-card.warning::before { background: #ffc107; }
-.stat-card.danger::before { background: #dc3545; }
-.stat-card.info::before { background: #0dcaf0; }
-.stat-card.purple::before { background: #6f42c1; }
-.stat-card.orange::before { background: #fd7e14; }
+
 
 .stat-icon {
     position: absolute;
@@ -505,6 +494,37 @@ if (isset($_SESSION['user']['name']) && !empty($_SESSION['user']['name']) && $_S
     color: white;
 }
 
+.notification-dropdown .dropdown-toggle {
+    border-radius: 10px;
+    padding: 10px 15px;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.notification-dropdown .dropdown-toggle:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+.notification-dropdown .dropdown-toggle:focus {
+    box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
+}
+
+#notificationBadge {
+    min-width: 20px;
+    height: 20px;
+    font-size: 0.65rem !important;
+    line-height: 16px;
+    padding: 2px 4px;
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+    100% { transform: scale(1); }
+}
+
 .notification-dropdown {
     min-width: 320px;
     border: none;
@@ -512,9 +532,16 @@ if (isset($_SESSION['user']['name']) && !empty($_SESSION['user']['name']) && $_S
     box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
 }
 
+.notification-dropdown .dropdown-menu {
+    border: none;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+    border-radius: 12px;
+}
+
 .notification-item {
-    padding: 1rem;
+    padding: 12px 16px;
     border-bottom: 1px solid #f8f9fa;
+    cursor: pointer;
     transition: background-color 0.2s ease;
 }
 
@@ -522,25 +549,51 @@ if (isset($_SESSION['user']['name']) && !empty($_SESSION['user']['name']) && $_S
     background-color: #f8f9fa;
 }
 
-.notification-icon {
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
+.notification-item.unread {
+    background-color: rgba(13, 110, 253, 0.05);
+    border-left: 3px solid #0d6efd;
+}
+
+.notification-item.urgent {
+    border-left: 3px solid #dc3545 !important;
+    background-color: rgba(220, 53, 69, 0.05) !important;
+}
+
+.notification-item.high {
+    border-left: 3px solid #ffc107 !important;
+    background-color: rgba(255, 193, 7, 0.05) !important;
+}
+
+.notification-title {
+    font-weight: 600;
+    font-size: 0.9rem;
+    margin-bottom: 4px;
+}
+
+.notification-message {
+    font-size: 0.8rem;
+    color: #6c757d;
+    margin-bottom: 6px;
+    line-height: 1.4;
+}
+
+.notification-meta {
     display: flex;
+    justify-content: space-between;
     align-items: center;
-    justify-content: center;
-    margin-right: 0.75rem;
-    font-size: 1rem;
+    font-size: 0.75rem;
+    color: #9ca3af;
 }
 
-.notification-icon.warning {
-    background: rgba(255, 193, 7, 0.2);
-    color: #ffc107;
+.notification-user {
+    background: #e9ecef;
+    padding: 2px 6px;
+    border-radius: 10px;
+    font-weight: 500;
 }
 
-.notification-icon.info {
-    background: rgba(13, 202, 240, 0.2);
-    color: #0dcaf0;
+.notification-time {
+    margin-left: auto;
 }
 </style>
 
@@ -824,7 +877,7 @@ function updateStatCards(data) {
     animateValue('totalSalesDue', 0, data.total_sales_due, '₹');
     animateValue('totalSalesAmount', 0, data.total_sales_amount, '₹');
     animateValue('totalPurchaseAmount', 0, data.total_purchase_amount, '₹');
-    animateValue('totalUsers', 0, data.total_users);
+    animateValue('totalClients', 0, data.total_clients);
     animateValue('purchaseInvoices', 0, data.purchase_invoices);
     animateValue('stockItems', 0, data.stock_items);
 }
@@ -1322,7 +1375,17 @@ function showErrorMessage(message) {
     // Silently log without showing user errors
     console.log('Dashboard info:', message);
 }
+
+// Admin Notification System
+<?php if ($role === 'admin'): ?>
+const userRole = '<?= $role ?>';
+<?php endif; ?>
 </script>
+
+<!-- Admin Notification System -->
+<?php if ($role === 'admin'): ?>
+<script src="assets/js/notifications.js"></script>
+<?php endif; ?>
 
 </body>
 </html>

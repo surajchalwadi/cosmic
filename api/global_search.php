@@ -36,7 +36,7 @@ while ($row = $client_result->fetch_assoc()) {
         'title' => $row['client_name'],
         'subtitle' => $row['company'] ?: $row['email'],
         'type' => 'client',
-        'url' => 'client_list.php?search=' . urlencode($row['client_name']),
+        'url' => 'client_list.php?search=' . urlencode($row['client_name']) . '&highlight=' . urlencode($search_term),
         'icon' => 'fas fa-user'
     ];
 }
@@ -58,7 +58,7 @@ while ($row = $product_result->fetch_assoc()) {
         'title' => $row['product_name'],
         'subtitle' => '₹' . number_format($row['price'], 2),
         'type' => 'product',
-        'url' => 'product_list.php?search=' . urlencode($row['product_name']),
+        'url' => 'product_list.php?search=' . urlencode($row['product_name']) . '&highlight=' . urlencode($search_term),
         'icon' => 'fas fa-box'
     ];
 }
@@ -79,7 +79,7 @@ while ($row = $estimate_result->fetch_assoc()) {
         'title' => $row['estimate_number'],
         'subtitle' => $row['bill_client_name'] . ' - ₹' . number_format($row['total_amount'], 2),
         'type' => 'estimate',
-        'url' => 'quotation_list.php?search=' . urlencode($row['estimate_number']),
+        'url' => 'quotation_list.php?search=' . urlencode($row['estimate_number']) . '&highlight=' . urlencode($search_term),
         'icon' => 'fas fa-file-invoice'
     ];
 }
@@ -101,7 +101,7 @@ try {
             'title' => $row['invoice_no'],
             'subtitle' => $row['party_name'],
             'type' => 'purchase',
-            'url' => 'purchase_list.php?search=' . urlencode($row['invoice_no']),
+            'url' => 'purchase_list.php?search=' . urlencode($row['invoice_no']) . '&highlight=' . urlencode($search_term),
             'icon' => 'fas fa-shopping-cart'
         ];
     }

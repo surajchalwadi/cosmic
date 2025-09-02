@@ -211,6 +211,22 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         // Commit transaction
         mysqli_commit($conn);
         
+        // Create admin notification for new quotation
+        include 'includes/notification_functions.php';
+        if ($_SESSION['user']['role'] === 'sales') {
+            $quotationData = [
+                'estimate_id' => $estimate_id,
+                'estimate_number' => $estimate_number,
+                'bill_client_name' => $bill_client_name,
+                'total_amount' => $total_amount
+            ];
+            
+            notifyQuotationCreated($_SESSION['user']['id'], $_SESSION['user']['name'], $quotationData);
+            
+            // Check for large quotation alert
+            notifyLargeQuotation($_SESSION['user']['id'], $_SESSION['user']['name'], $quotationData);
+        }
+        
         $_SESSION['success'] = "Quotation saved successfully! Quotation #: " . $estimate_number;
         header("Location: quotation_list.php");
         exit;

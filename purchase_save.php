@@ -78,8 +78,31 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             }
         }
         
+        // Calculate total purchase amount for notifications
+        $total_amount = 0;
+        for ($i = 0; $i < count($product_names); $i++) {
+            $quantity = (int)$quantities[$i];
+            $price = (float)$prices[$i];
+            $total_amount += $quantity * $price;
+        }
+        
         // Commit transaction
         mysqli_commit($conn);
+        
+        // Create admin notification for new purchase
+        include 'includes/notification_functions.php';
+        if ($_SESSION['user']['role'] === 'inventory') {
+            $purchaseData = [
+                'purchase_id' => $purchase_id,
+                'invoice_no' => $invoice_no,
+                'party_name' => $party_name
+            ];
+            
+            notifyPurchaseCreated($_SESSION['user']['id'], $_SESSION['user']['name'], $purchaseData, $total_amount);
+            
+            // Check for large purchase alert
+            notifyLargePurchase($_SESSION['user']['id'], $_SESSION['user']['name'], $purchaseData, $total_amount);
+        }
         
         $_SESSION['success'] = "Purchase saved successfully!";
         header("Location: purchase_list.php");

@@ -554,5 +554,8 @@ function printTable() {
 }
 </script>
 
+<!-- Search Highlighting Script -->
+<script src="assets/js/highlight.js"></script>
+
 </body>
 </html>

@@ -124,5 +124,9 @@ $(function () {
     $('[data-bs-toggle="tooltip"]').tooltip();
 });
 </script>
+
+<!-- Search Highlighting Script -->
+<script src="assets/js/highlight.js"></script>
+
 </body>
 </html>

@@ -28,7 +28,7 @@ try {
     $data['total_purchase_due'] = 0;
     $data['total_sales_amount'] = 0;
     $data['total_sales_due'] = 0;
-    $data['total_users'] = 1;
+    $data['total_clients'] = 0;
     $data['purchase_invoices'] = 0;
     $data['stock_items'] = 5;
     
@@ -54,13 +54,13 @@ try {
         }
     }
     
-    // Check users table
-    $users_check = mysqli_query($conn, "SHOW TABLES LIKE 'users'");
-    if (mysqli_num_rows($users_check) > 0) {
-        $users_query = "SELECT COUNT(*) as count FROM users WHERE status = 1";
-        $users_result = mysqli_query($conn, $users_query);
-        if ($users_result) {
-            $data['total_users'] = mysqli_fetch_assoc($users_result)['count'] ?? 1;
+    // Check clients table
+    $clients_check = mysqli_query($conn, "SHOW TABLES LIKE 'clients'");
+    if (mysqli_num_rows($clients_check) > 0) {
+        $clients_query = "SELECT COUNT(*) as count FROM clients WHERE status = 'Active'";
+        $clients_result = mysqli_query($conn, $clients_query);
+        if ($clients_result) {
+            $data['total_clients'] = mysqli_fetch_assoc($clients_result)['count'] ?? 0;
         }
     }
     

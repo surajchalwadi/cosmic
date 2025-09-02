@@ -196,5 +196,8 @@ document.getElementById('selectAll').addEventListener('change', function() {
 
 </script>
 
+<!-- Search Highlighting Script -->
+<script src="assets/js/highlight.js"></script>
+
 </body>
 </html>

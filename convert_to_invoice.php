@@ -93,6 +93,12 @@ try {
             }
         }
         
+        // Create admin notification for invoice conversion
+        include 'includes/notification_functions.php';
+        if ($_SESSION['user']['role'] === 'sales') {
+            notifyInvoiceConverted($_SESSION['user']['id'], $_SESSION['user']['name'], $estimate);
+        }
+        
         echo json_encode([
             'success' => true, 
             'message' => 'Successfully created invoice.' . $emailMessage,

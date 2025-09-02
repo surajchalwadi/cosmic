@@ -44,6 +44,19 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     mysqli_stmt_bind_param($stmt, 'ssssssssssi', $client_name, $company, $email, $phone, $address, $country, $state, $city, $postal, $status, $created_by);
 
     if (mysqli_stmt_execute($stmt)) {
+        $client_id = mysqli_insert_id($conn);
+        // Create admin notification for new client
+        include 'includes/notification_functions.php';
+        if ($_SESSION['user']['role'] === 'sales') {
+            $clientData = [
+                'client_id' => $client_id,
+                'client_name' => $client_name,
+                'company' => $company
+            ];
+            
+            notifyNewClientAdded($_SESSION['user']['id'], $_SESSION['user']['name'], $clientData);
+        }
+        
         $_SESSION['success'] = "Client added successfully!";
         header("Location: client_list.php");
     } else {
